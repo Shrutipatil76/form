@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            margin-top: 50px;
+        }
+        .error {
+            color: red;
+            font-size: 0.875em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container form-container">
+        <h2 class="text-center">Registration Form</h2>
+        <form id="registrationForm" onsubmit="return validateForm()">
+            <!-- Full Name Fields -->
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Enter your full name" required>
+                <small id="nameError" class="error"></small>
+            </div>
+
+            <!-- Aadhar Number -->
+            <div class="form-group">
+                <label for="aadhar">Aadhar Number</label>
+                <input type="text" class="form-control" id="aadhar" name="aadhar" placeholder="Enter 12-digit Aadhar number" required>
+                <small id="aadharError" class="error"></small>
+            </div>
+
+            <!-- PAN Card Number -->
+            <div class="form-group">
+                <label for="pan">PAN Card Number</label>
+                <input type="text" class="form-control" id="pan" name="pan" placeholder="Enter your PAN card number" required>
+                <small id="panError" class="error"></small>
+            </div>
+
+            <!-- Mobile Number -->
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter 10-digit mobile number" required>
+                <small id="mobileError" class="error"></small>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" class="form-control" id="dob" name="dob" required>
+                <small id="dobError" class="error"></small>
+            </div>
+
+            <!-- Marks -->
+            <div class="form-group">
+                <label for="marks">Marks (6 Subjects)</label>
+                <div id="marksContainer">
+                    <input type="number" class="form-control mb-2" id="marks1" name="marks1" placeholder="Subject 1 Marks" required>
+                    <input type="number" class="form-control mb-2" id="marks2" name="marks2" placeholder="Subject 2 Marks" required>
+                    <input type="number" class="form-control mb-2" id="marks3" name="marks3" placeholder="Subject 3 Marks" required>
+                    <input type="number" class="form-control mb-2" id="marks4" name="marks4" placeholder="Subject 4 Marks" required>
+                    <input type="number" class="form-control mb-2" id="marks5" name="marks5" placeholder="Subject 5 Marks" required>
+                    <input type="number" class="form-control mb-2" id="marks6" name="marks6" placeholder="Subject 6 Marks" required>
+                </div>
+                <small id="marksError" class="error"></small>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        function validateForm() {
+            // Clear previous errors
+            document.getElementById("nameError").innerHTML = "";
+            document.getElementById("aadharError").innerHTML = "";
+            document.getElementById("panError").innerHTML = "";
+            document.getElementById("mobileError").innerHTML = "";
+            document.getElementById("dobError").innerHTML = "";
+            document.getElementById("marksError").innerHTML = "";
+
+            var fullname = document.getElementById("fullname").value;
+            var aadhar = document.getElementById("aadhar").value;
+            var pan = document.getElementById("pan").value;
+            var mobile = document.getElementById("mobile").value;
+            var dob = document.getElementById("dob").value;
+            var marks = [
+                parseInt(document.getElementById("marks1").value),
+                parseInt(document.getElementById("marks2").value),
+                parseInt(document.getElementById("marks3").value),
+                parseInt(document.getElementById("marks4").value),
+                parseInt(document.getElementById("marks5").value),
+                parseInt(document.getElementById("marks6").value)
+            ];
+
+            // Validate Full Name
+            var nameParts = fullname.split(" ");
+            if (nameParts.length < 3) {
+                document.getElementById("nameError").innerHTML = "Full name should include Firstname, Middlename, and Lastname.";
+                return false;
+            }
+
+            // Validate Aadhar Number (12 digits)
+            if (!/^\d{12}$/.test(aadhar)) {
+                document.getElementById("aadharError").innerHTML = "Aadhar number must be 12 digits.";
+                return false;
+            }
+
+            // Validate PAN Card Number (Format: ABCDE1234F)
+            if (!/[A-Z]{5}[0-9]{4}[A-Z]{1}/.test(pan)) {
+                document.getElementById("panError").innerHTML = "Invalid PAN card number format.";
+                return false;
+            }
+
+            // Validate Mobile Number (10 digits)
+            if (!/^\d{10}$/.test(mobile)) {
+                document.getElementById("mobileError").innerHTML = "Mobile number must be 10 digits.";
+                return false;
+            }
+
+            // Validate Date of Birth (Age above 18)
+            var birthDate = new Date(dob);
+            var today = new Date();
+            var age = today.getFullYear() - birthDate.getFullYear();
+            if (age < 18) {
+                document.getElementById("dobError").innerHTML = "You must be at least 18 years old.";
+                return false;
+            }
+
+            // Validate Marks and Calculate Best of Five Percentage
+            var validMarks = marks.every(mark => mark >= 0 && mark <= 100);
+            if (!validMarks) {
+                document.getElementById("marksError").innerHTML = "Marks should be between 0 and 100.";
+                return false;
+            }
+
+            // Sort marks and calculate percentage for the best of five
+            marks.sort((a, b) => b - a); // Sort in descending order
+            var bestFiveMarks = marks.slice(0, 5); // Take top 5 marks
+            var totalMarks = bestFiveMarks.reduce((sum, mark) => sum + mark, 0);
+            var percentage = (totalMarks / 500) * 100; // Best of five percentage
+
+            alert("Best of Five Percentage: " + percentage.toFixed(2) + "%");
+
+            return true;
+        }
+    </script>
+</body>
+</html>
